@@ -1,4 +1,4 @@
-from .schema.student_course import StudentCourse
+from .schema.nbgrader import StudentCourse
 from .schema.volume import HomeVolumeMount, SharedVolumeMount, TempVolumeMount, Volume
 
 
