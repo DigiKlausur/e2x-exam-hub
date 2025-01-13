@@ -1,8 +1,12 @@
+from typing import Dict, List, Union
+
 from .schema.nbgrader import StudentCourse
 from .schema.volume import HomeVolumeMount, SharedVolumeMount, TempVolumeMount, Volume
 
 
-def get_volume_mounts(course: StudentCourse, username: str):
+def get_volume_mounts(
+    course: StudentCourse, username: str
+) -> List[Dict[str, Union[str, bool]]]:
     volume_mounts = list()
 
     exchange_volume = Volume(name="disk3", sub_path="nbgrader/exchanges")
