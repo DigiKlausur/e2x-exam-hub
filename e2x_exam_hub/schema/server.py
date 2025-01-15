@@ -4,6 +4,7 @@ import yaml
 from pydantic import Field
 
 from .base import Image, ModelWithCommands, Resources
+from .mounts import Mounts
 from .nbgrader import NbGrader
 
 
@@ -24,6 +25,10 @@ class ServerConfig(ModelWithCommands):
         ...,
         description="Root path for the configuration files",
     )
+    mounts: Mounts = Field(
+        ...,
+        description="Mounts configuration",
+    )
 
     @classmethod
     def from_yaml_file(cls, file_path: str):
@@ -36,4 +41,5 @@ class ServerConfig(ModelWithCommands):
                 image=Image(**yaml_config["image"]),
                 resources=Resources(**yaml_config["resources"]),
                 nbgrader=NbGrader.from_dict(config_root, yaml_config["nbgrader"]),
+                mounts=Mounts(**yaml_config["mounts"]),
             )
