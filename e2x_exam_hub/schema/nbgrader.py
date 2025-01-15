@@ -1,110 +1,34 @@
 import os
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
-from .base import BaseCourse, Image, ModelWithCommands, Resources
-from .utils import load_user_list
-from .volume import Volume
+from .course import StudentCourse
 
 
-class ExchangeConfig(BaseModel):
-    personalized_feedback: bool = Field(
-        True,
-        description="Whether personalized feedback is enabled",
+class SemesterConfig(BaseModel):
+    semester: str = Field(
+        ...,
+        description="Semester ID",
     )
-    personalized_inbound: bool = Field(
-        True,
-        description="Whether personalized inbound is enabled",
-    )
-    personalized_outbound: bool = Field(
-        False,
-        description="Whether personalized outbound is enabled",
-    )
-    exchange_root: str = Field(
-        "/srv/nbgrader/exchange", description="Root path for the exchange directory"
+    exam_period: str = Field(
+        ...,
+        description="Exam period",
     )
 
-    def _get_step_name(self, step: str) -> str:
-        return f"personalized-{step}" if getattr(self, f"personalized_{step}") else step
 
-    def _get_sub_path(
-        self, volume: Volume, course: BaseCourse, username: str, step
-    ) -> str:
-        directory = self._get_step_name(step)
-        path = os.path.join(
-            volume.sub_path,
-            course.name,
-            course.course_id,
-            directory,
-        )
-        if getattr(self, f"personalized_{step}"):
-            path = os.path.join(path, username)
-        return path
-
-    def _get_mount_path(self, course: BaseCourse, username: str, step) -> str:
-        directory = self._get_step_name(step)
-        path = os.path.join(
-            self.exchange_root,
-            course.course_id,
-            directory,
-        )
-        if getattr(self, f"personalized_{step}"):
-            path = os.path.join(path, username)
-        return path
-
-    def get_volume_mounts(
-        self, volume: Volume, course: BaseCourse, username: str
-    ) -> List[Dict[str, Union[str, bool]]]:
-        return [
-            dict(
-                name=volume.name,
-                read_only=True,
-                subPath=self._get_sub_path(volume, course, username, step),
-                mountPath=self._get_mount_path(course, username, step),
-            )
-            for step in ["feedback", "inbound", "outbound"]
-        ]
-
-    def get_commands(self, nbgrader_config_file: str) -> List[str]:
-        return [
-            r"echo 'c.Exchange.personalized_feedback = {}' >> {}".format(
-                self.personalized_feedback, nbgrader_config_file
-            ),
-            r"echo 'c.Exchange.personalized_inbound = {}' >> {}".format(
-                self.personalized_inbound, nbgrader_config_file
-            ),
-            r"echo 'c.Exchange.personalized_outbound = {}' >> {}".format(
-                self.personalized_outbound, nbgrader_config_file
-            ),
-        ]
-
-
-class StudentCourse(BaseCourse, ModelWithCommands):
-    course_members: List[str] = Field(
-        list(),
-        description="List of course members",
-    )
-    exchange: ExchangeConfig = Field(
-        ExchangeConfig(),
-        description="Exchange settings",
-    )
-    image: Optional[Image] = Field(
-        None,
-        description="Image settings",
-    )
-    resources: Optional[Resources] = Field(
-        None,
-        description="Resource settings",
+class ActiveCourseConfig(BaseModel):
+    semesters: List[SemesterConfig] = Field(
+        ...,
+        description="List of semesters",
     )
 
-    def get_exchange_volume_mounts(
-        self, volume: Volume, username: str
-    ) -> List[Dict[str, Union[str, bool]]]:
-        return self.exchange.get_volume_mounts(volume, self, username)
 
-    def get_exchange_commands(self, nbgrader_config_file: str) -> List[str]:
-        return self.exchange.get_commands(nbgrader_config_file)
+class ActiveStudentCourses(BaseModel):
+    courses: Dict[str, ActiveCourseConfig] = Field(
+        ...,
+        description="List of courses",
+    )
 
 
 class NbGrader(BaseModel):
@@ -123,21 +47,19 @@ class NbGrader(BaseModel):
 
     @classmethod
     def from_dict(cls, config_root: str, nbgrader_dict: dict):
-        student_course_list = nbgrader_dict.get("student_course_list", dict())
-        student_courses = []
+        active_student_courses = ActiveStudentCourses(
+            courses=nbgrader_dict.get("active_student_courses", dict())
+        )
         exam_course_dir = nbgrader_dict["exam_course_dir"]
-        for course_name, semester_dict in student_course_list.items():
-            for semester, course_dict in semester_dict.items():
+        student_courses = []
+        for course_name, active_course_config in active_student_courses.courses.items():
+            for semester_config in active_course_config.semesters:
                 student_courses.append(
-                    StudentCourse(
-                        name=course_name,
-                        semester_id=semester,
-                        **course_dict,
-                        course_members=load_user_list(
-                            os.path.join(config_root, exam_course_dir),
-                            course_name,
-                            semester,
-                        ),
+                    StudentCourse.from_yaml_file(
+                        os.path.join(config_root, exam_course_dir),
+                        course_name,
+                        semester_config.semester,
+                        semester_config.exam_period,
                     )
                 )
         return cls(
@@ -146,7 +68,7 @@ class NbGrader(BaseModel):
             commands=nbgrader_dict.get("commands", dict()),
         )
 
-    def get_courses(self, username: str) -> List[StudentCourse]:
+    def get_user_courses(self, username: str) -> List[StudentCourse]:
         return [
             course
             for course in self.student_courses

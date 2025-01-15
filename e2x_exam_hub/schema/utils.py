@@ -1,14 +1,21 @@
-import os
 from typing import List
 
 import pandas as pd
 
 
-def load_user_list(config_root: str, course_name: str, semester: str) -> List[str]:
+def load_user_list(user_list_file: str) -> List[str]:
+    """
+    Load a list of usernames from a CSV file.
+
+    Args:
+        user_list_file (str): The path to the CSV file containing the user list.
+
+    Returns:
+        List[str]: A list of usernames extracted from the CSV file. If the file is not found, 
+        returns an empty list.
+    """
     users = []
     try:
-        user_list_file = os.path.join(config_root, f"{course_name}-{semester}.csv")
-        print(user_list_file)
         userlist = pd.read_csv(user_list_file)
         if "Username" in userlist.columns:
             users = list(userlist.Username)
