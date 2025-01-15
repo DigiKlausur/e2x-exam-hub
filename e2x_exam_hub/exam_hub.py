@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 from traitlets import Unicode
 from traitlets.config import Config, LoggingConfigurable
 
-from .schema import BaseCourse, ServerConfig
+from .schema import BaseCourse, ServerConfig, StudentCourse
 
 
 class ExamHub(LoggingConfigurable):
@@ -77,3 +77,37 @@ class ExamHub(LoggingConfigurable):
             information.
         """
         return self.server_config.mounts.get_mounts(course, username)
+
+    def get_user_courses(self, username: str) -> List[StudentCourse]:
+        """
+        Retrieve the list of courses for a given student.
+
+        Args:
+            username (str): The username of the student for whom to retrieve courses.
+
+        Returns:
+            List[StudentCourse]: A list of StudentCourse objects representing the courses of the
+            student.
+        """
+        return self.server_config.nbgrader.get_user_courses(username)
+
+    def get_server_commands(self) -> List[str]:
+        """
+        Retrieve the server commands for the JupyterHub.
+
+        Returns:
+            List[str]: A list of commands to be executed
+        """
+        return self.server_config.all_commands
+
+    def get_course_commands(self, course: StudentCourse) -> List[str]:
+        """
+        Retrieve the course commands for a given course.
+
+        Args:
+            course (StudentCourse): The course for which to retrieve commands.
+
+        Returns:
+            List[str]: A list of commands to be executed
+        """
+        return course.all_commands
