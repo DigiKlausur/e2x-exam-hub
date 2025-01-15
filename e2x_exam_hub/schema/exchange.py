@@ -26,12 +26,12 @@ class ExchangeConfig(BaseModel):
     def _get_step_name(self, step: str) -> str:
         return f"personalized-{step}" if getattr(self, f"personalized_{step}") else step
 
-    def _get_sub_path(
+    def _get_subPath(
         self, volume: Volume, course: BaseCourse, username: str, step
     ) -> str:
         directory = self._get_step_name(step)
         path = os.path.join(
-            volume.sub_path,
+            volume.subPath,
             course.name,
             course.course_id,
             directory,
@@ -40,7 +40,7 @@ class ExchangeConfig(BaseModel):
             path = os.path.join(path, username)
         return path
 
-    def _get_mount_path(self, course: BaseCourse, username: str, step) -> str:
+    def _get_mountPath(self, course: BaseCourse, username: str, step) -> str:
         directory = self._get_step_name(step)
         path = os.path.join(
             self.exchange_root,
@@ -57,9 +57,9 @@ class ExchangeConfig(BaseModel):
         return [
             dict(
                 name=volume.name,
-                read_only=True,
-                subPath=self._get_sub_path(volume, course, username, step),
-                mountPath=self._get_mount_path(course, username, step),
+                readOnly=True,
+                subPath=self._get_subPath(volume, course, username, step),
+                mountPath=self._get_mountPath(course, username, step),
             )
             for step in ["feedback", "inbound", "outbound"]
         ]

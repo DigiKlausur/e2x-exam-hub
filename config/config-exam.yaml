@@ -22,20 +22,20 @@ commands:
 mounts:
   exchange:
     name: disk3
-    sub_path: nbgrader/exchanges  # Path for nbgrader exchanges
+    subPath: nbgrader/exchanges  # Path for nbgrader exchanges
   share:
     name: disk3
-    sub_path: shares/exam  # Path for shared exam files
+    subPath: shares/exam  # Path for shared exam files
     # These are files that are shared between all users of a course.
     # There will be two mounts:
     # 1. A public mount for all courses.
     # 2. A customized mount with the course name, which is done when the config is loaded.
   temp:
     name: disk2
-    sub_path: homes  # Temporary storage path
+    subPath: homes  # Temporary storage path
   home:
     name: disk2
-    sub_path: homes  # Home directory path
+    subPath: homes  # Home directory path
 # Docker image configuration
 image:
   name: ghcr.io/digiklausur/docker-stacks/datascience-notebook-exam  # Docker image name

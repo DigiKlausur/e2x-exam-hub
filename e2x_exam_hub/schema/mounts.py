@@ -13,24 +13,24 @@ class Mount(BaseModel):
 
     Attributes:
         name (str): Name of the mount.
-        read_only (bool): Whether the mount is read-only. Defaults to True.
-        sub_path (str): Sub-path for the mount.
-        mount_path (str): Mount path for the mount.
+        readOnly (bool): Whether the mount is read-only. Defaults to True.
+        subPath (str): Sub-path for the mount.
+        mountPath (str): Mount path for the mount.
     """
 
     name: str = Field(
         ...,
         description="Name of the mount",
     )
-    read_only: bool = Field(
+    readOnly: bool = Field(
         True,
         description="Whether the mount is read-only",
     )
-    sub_path: str = Field(
+    subPath: str = Field(
         ...,
         description="Sub-path for the mount",
     )
-    mount_path: str = Field(
+    mountPath: str = Field(
         ...,
         description="Mount path for the mount",
     )
@@ -95,15 +95,15 @@ class Mounts(BaseModel):
         """
         return Mount(
             name=self.temp.name,
-            read_only=False,
-            sub_path=os.path.join(
-                self.temp.sub_path,
+            readOnly=False,
+            subPath=os.path.join(
+                self.temp.subPath,
                 "exam",
                 f"{course.semester_id}-{course.exam_period}",
                 f"{course.name}-{username}",
                 ".tmp",
             ),
-            mount_path="/tmp",
+            mountPath="/tmp",
         )
 
     def _get_share_mounts(self, course: BaseCourse) -> List[Mount]:
@@ -118,15 +118,15 @@ class Mounts(BaseModel):
         """
         public_share_mount = Mount(
             name=self.share.name,
-            read_only=True,
-            sub_path=os.path.join(self.share.sub_path, "public"),
-            mount_path=os.path.join("/srv/shares", "public"),
+            readOnly=True,
+            subPath=os.path.join(self.share.subPath, "public"),
+            mountPath=os.path.join("/srv/shares", "public"),
         )
         course_share_mount = Mount(
             name=self.share.name,
-            read_only=True,
-            sub_path=os.path.join(self.share.sub_path, "courses", course.name),
-            mount_path=os.path.join("/srv/shares", course.name),
+            readOnly=True,
+            subPath=os.path.join(self.share.subPath, "courses", course.name),
+            mountPath=os.path.join("/srv/shares", course.name),
         )
         return [public_share_mount, course_share_mount]
 
@@ -143,15 +143,15 @@ class Mounts(BaseModel):
         """
         return Mount(
             name=self.home.name,
-            read_only=False,
-            sub_path=os.path.join(
-                self.home.sub_path,
+            readOnly=False,
+            subPath=os.path.join(
+                self.home.subPath,
                 "exam",
                 f"{course.semester_id}-{course.exam_period}",
                 f"{course.name}-{username}",
                 "home",
             ),
-            mount_path="/home/jovyan",
+            mountPath="/home/jovyan",
         )
 
     def _get_exchange_mounts(self, course: StudentCourse, username: str) -> List[Mount]:

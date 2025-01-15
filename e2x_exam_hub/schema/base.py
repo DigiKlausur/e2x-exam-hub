@@ -50,14 +50,14 @@ class Volume(BaseModel):
 
     Attributes:
         name (str): Name of the volume.
-        sub_path (str): Sub-path for the volume.
+        subPath (str): Sub-path for the volume.
     """
 
     name: str = Field(
         ...,
         description="Name of the volume",
     )
-    sub_path: str = Field(
+    subPath: str = Field(
         ...,
         description="Sub-path for the volume",
     )
