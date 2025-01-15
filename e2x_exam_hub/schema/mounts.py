@@ -3,26 +3,8 @@ from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
 
-from .base import BaseCourse
-
-
-class Volume(BaseModel):
-    """
-    Volume model representing a volume with a name and sub-path.
-
-    Attributes:
-        name (str): Name of the volume.
-        sub_path (str): Sub-path for the volume.
-    """
-
-    name: str = Field(
-        ...,
-        description="Name of the volume",
-    )
-    sub_path: str = Field(
-        ...,
-        description="Sub-path for the volume",
-    )
+from .base import BaseCourse, Volume
+from .course import StudentCourse
 
 
 class Mount(BaseModel):
@@ -172,7 +154,7 @@ class Mounts(BaseModel):
             mount_path="/home/jovyan",
         )
 
-    def _get_exchange_mounts(self, course: BaseCourse, username: str) -> List[Mount]:
+    def _get_exchange_mounts(self, course: StudentCourse, username: str) -> List[Mount]:
         """
         Retrieve the exchange volume mounts for a given course and user.
 
@@ -186,7 +168,7 @@ class Mounts(BaseModel):
         return course.get_exchange_volume_mounts(self.exchange, username)
 
     def get_mounts(
-        self, course: BaseCourse, username: str
+        self, course: StudentCourse, username: str
     ) -> List[Dict[str, Union[str, bool]]]:
         """
         Retrieve a list of mounts for a given course and user.
@@ -195,7 +177,7 @@ class Mounts(BaseModel):
         and exchange mounts for the specified course and username.
 
         Args:
-            course (BaseCourse): The course for which mounts are being retrieved.
+            course (StudentCourse): The course for which mounts are being retrieved.
             username (str): The username of the user for whom mounts are being retrieved.
 
         Returns:
