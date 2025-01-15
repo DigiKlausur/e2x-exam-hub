@@ -1,0 +1,67 @@
+# commands: This section is optional and can be used to specify any commands
+# that should be run before starting the container. The section names within
+# this block are purely for organizational purposes and do not have any effect
+# on the execution of the commands. You can group commands under different
+# section names to keep them organized and readable.
+commands:
+  clean_up:
+    - rm -rf $HOME/.jupyter/nbconfig*
+  notebook:
+    - echo c.NotebookApp.show_banner = False >> /etc/jupyter/jupyter_notebook_config.py
+  nbgrader:
+    - echo c.Exchange.timezone = \"Europe/Berlin\" >> /etc/jupyter/nbgrader_config.py
+    - echo c.Exchange.root = \"/srv/nbgrader/exchange\" >> /etc/jupyter/nbgrader_config.py
+    - echo c.NbGraderAPI.timezone = \"Europe/Berlin\" >> /etc/jupyter/nbgrader_config.py
+    - echo c.CourseDirectory.ignore = \[\'.ipynb_checkpoints\', \'*.pyc*\', \'__pycache__\',
+      \'feedback\', \'.*\'\] >> /etc/jupyter/nbgrader_config.py
+    - echo c.Help.shared_paths.extend\(\[\"/srv/shares/\"\]\) >> /etc/jupyter/nbgrader_config.py
+    - echo c.DiagramEditor.drawDomain = \"https://10.20.168.225/drawio?embed=1\" >>
+      /etc/jupyter/nbgrader_config.py
+    - echo c.DiagramEditor.drawOrigin = \"https://10.20.168.225\" >> /etc/jupyter/nbgrader_config.py
+# Mount points for various directories
+mounts:
+  exchange:
+    name: disk3
+    sub_path: nbgrader/exchanges  # Path for nbgrader exchanges
+  share:
+    name: disk3
+    sub_path: shares/exam  # Path for shared exam files
+    # These are files that are shared between all users of a course.
+    # There will be two mounts:
+    # 1. A public mount for all courses.
+    # 2. A customized mount with the course name, which is done when the config is loaded.
+  temp:
+    name: disk2
+    sub_path: homes  # Temporary storage path
+  home:
+    name: disk2
+    sub_path: homes  # Home directory path
+# Docker image configuration
+image:
+  name: ghcr.io/digiklausur/docker-stacks/datascience-notebook-exam  # Docker image name
+  pullPolicy: IfNotPresent  # Pull policy for the Docker image
+  tag: 16-07-2024  # Tag for the Docker image
+
+# nbgrader configuration
+nbgrader:
+  exchange_root: "/srv/nbgrader/exchange"  # Root directory for nbgrader exchanges
+  exam_course_dir: "nbgrader/student_exam_courses"  # Directory for student exam courses, containing the course config and user list
+  # Each course config is located in a subdirectory with the course name and semester and should contain the following files:
+  # 1. <course_name>.<semester>.<exam_period>.yaml
+  # 2. <course_name>.<semester>.<exam_period>.csv
+  active_student_courses: # List of active student courses
+    IT_Recht-Klausur:
+      semesters:
+        - semester: SS24BWI  # Semester identifier
+          exam_period: PZ1  # Exam period identifier
+    Machine-Learning-Exam:
+      semesters:
+        - semester: WS24  # Semester identifier
+          exam_period: PZ1  # Exam period identifier
+
+# Resource limits and guarantees
+resources:
+  cpu_guarantee: 0.001  # Minimum CPU resources guaranteed
+  cpu_limit: 2.0  # Maximum CPU resources allowed
+  mem_guarantee: 1.0G  # Minimum memory resources guaranteed
+  mem_limit: 2.0G  # Maximum memory resources allowed
