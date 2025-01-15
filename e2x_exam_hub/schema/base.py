@@ -44,6 +44,25 @@ class Resources(BaseModel):
     mem_limit: str = Field("2.0G", description="Memory resource limit")
 
 
+class Volume(BaseModel):
+    """
+    Volume model representing a volume with a name and sub-path.
+
+    Attributes:
+        name (str): Name of the volume.
+        sub_path (str): Sub-path for the volume.
+    """
+
+    name: str = Field(
+        ...,
+        description="Name of the volume",
+    )
+    sub_path: str = Field(
+        ...,
+        description="Sub-path for the volume",
+    )
+
+
 class BaseCourse(BaseModel):
     name: str = Field(
         ...,
