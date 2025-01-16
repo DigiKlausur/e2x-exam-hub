@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -69,8 +69,8 @@ class Mounts(BaseModel):
         ...,
         description="Volume for the exchange directory",
     )
-    share: Volume = Field(
-        ...,
+    share: Optional[Volume] = Field(
+        None,
         description="Volume for the shared directory",
     )
     temp: Volume = Field(
@@ -116,6 +116,8 @@ class Mounts(BaseModel):
         Returns:
             List[Mount]: The mount configurations for the shared directory of the course.
         """
+        if self.share is None:
+            return []
         public_share_mount = Mount(
             name=self.share.name,
             readOnly=True,
