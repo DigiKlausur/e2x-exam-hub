@@ -1,0 +1,27 @@
+exchange:
+  personalized_feedback: true # Personalized feedback directory for students
+  personalized_inbound: true # Personalized inbound directory for students, where students submit their exam files
+  personalized_outbound: true # Personalized outbound directory for students, where students fetch their exam files from
+# commands: This section is optional and can be used to specify any commands
+# that should be run before starting the container. The section names within
+# this block are purely for organizational purposes and do not have any effect
+# on the execution of the commands. You can group commands under different
+# section names to keep them organized and readable.
+commands:
+  submission_exporter:
+    - echo c.SubmissionExporter.exam_submitted_message = \"Ihre Klausur wurde erfolgreich abgegeben.\" >> /etc/jupyter/nbgrader_config.py
+    - echo c.SubmissionExporter.your_hashcode_message = \"Ihr Hashcode ist:\" >> /etc/jupyter/nbgrader_config.py
+    - echo c.SubmissionExporter.verify_exam_message = \"Bitte überprüfen Sie Ihre Klausur unten und schalten Sie den Rechner aus.\" >> /etc/jupyter/nbgrader_config.py
+# Docker image configuration. This section is optional and can be used to specify the Docker image to be used for the course.
+# If not specified, the default image from the hub config will be used.
+image:
+  name: ghcr.io/digiklausur/docker-stacks/datascience-notebook-exam  # Docker image name
+  pullPolicy: IfNotPresent  # Pull policy for the Docker image
+  tag: 16-07-2024  # Tag for the Docker image
+# Resource limits and guarantees. This section is optional and can be used to specify the resource limits and guarantees for the course.
+# If not specified, the default values from the hub config will be used.
+resources:
+  cpu_guarantee: 0.001  # Minimum CPU resources guaranteed
+  cpu_limit: 2.0  # Maximum CPU resources allowed
+  mem_guarantee: 1.0G  # Minimum memory resources guaranteed
+  mem_limit: 2.0G  # Maximum memory resources allowed
