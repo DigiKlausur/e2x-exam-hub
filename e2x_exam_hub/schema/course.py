@@ -31,7 +31,7 @@ class StudentCourse(BaseCourse, ModelWithCommands):
     def from_yaml_file(
         cls, base_path: str, course_name: str, semester_id: str, exam_period: str
     ) -> "StudentCourse":
-        course_path = os.path.join(base_path, course_name, semester_id)
+        course_path = os.path.join(base_path, course_name)
         config_file = os.path.join(
             course_path,
             f"{course_name}.{semester_id}.{exam_period}.yaml",

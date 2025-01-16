@@ -1,5 +1,0 @@
-# See the IT_Recht-Klausur course config for an example of a full course config.
-exchange:
-  personalized_feedback: true # Personalized feedback directory for students
-  personalized_inbound: true # Personalized inbound directory for students, where students submit their exam files
-  personalized_outbound: false # Personalized outbound directory for students, where students fetch their exam files from
