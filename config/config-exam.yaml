@@ -23,7 +23,7 @@ mounts:
   exchange:
     name: disk3
     subPath: nbgrader/exchanges  # Path for nbgrader exchanges
-  share:
+  share: # Optional
     name: disk3
     subPath: shares/exam  # Path for shared exam files
     # These are files that are shared between all users of a course.
@@ -32,7 +32,7 @@ mounts:
     # 2. A customized mount with the course name, which is done when the config is loaded.
   temp:
     name: disk2
-    subPath: homes  # Temporary storage path
+    subPath: homes  # Temporary storage path, will be customized with the user name and course information
   home:
     name: disk2
     subPath: homes  # Home directory path
