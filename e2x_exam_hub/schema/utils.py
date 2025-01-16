@@ -11,7 +11,7 @@ def load_user_list(user_list_file: str) -> List[str]:
         user_list_file (str): The path to the CSV file containing the user list.
 
     Returns:
-        List[str]: A list of usernames extracted from the CSV file. If the file is not found, 
+        List[str]: A list of usernames extracted from the CSV file. If the file is not found,
         returns an empty list.
     """
     users = []
