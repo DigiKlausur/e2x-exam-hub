@@ -54,15 +54,25 @@ class ExchangeConfig(BaseModel):
     def get_volume_mounts(
         self, volume: Volume, course: BaseCourse, username: str
     ) -> List[Dict[str, Union[str, bool]]]:
-        return [
+        mounts = [
             dict(
                 name=volume.name,
                 readOnly=True,
                 subPath=self._get_subPath(volume, course, username, step),
                 mountPath=self._get_mountPath(course, username, step),
             )
-            for step in ["feedback", "inbound", "outbound"]
+            for step in ["feedback", "outbound"]
         ]
+        # Inbound is always read-write for the student
+        mounts.append(
+            dict(
+                name=volume.name,
+                readOnly=False,
+                subPath=self._get_subPath(volume, course, username, "inbound"),
+                mountPath=self._get_mountPath(course, username, "inbound"),
+            )
+        )
+        return mounts
 
     def get_commands(self, nbgrader_config_file: str) -> List[str]:
         return [
